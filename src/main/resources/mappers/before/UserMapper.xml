@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ch.ch9.repository.before.UserRepository">
+
+    <!-- 结果映射 -->
+    <resultMap id="userResultMap" type="BUser">
+        <id property="id" column="id"/>
+        <result property="bemail" column="bemail"/>
+        <result property="bpwd" column="bpwd"/>
+        <result property="userName" column="userName"/>
+    </resultMap>
+
+    <!-- 根据邮箱查询用户 -->
+    <select id="findByEmail" parameterType="String" resultMap="userResultMap">
+        SELECT id, bemail, bpwd, userName
+        FROM busertable
+        WHERE bemail = #{bemail}
+    </select>
+
+    <!-- 根据ID查询用户 -->
+    <select id="findById" parameterType="Integer" resultMap="userResultMap">
+        SELECT id, bemail, bpwd, userName
+        FROM busertable
+        WHERE id = #{id}
+    </select>
+
+    <!-- 用户注册 -->
+    <insert id="save" parameterType="BUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO busertable (bemail, bpwd, userName)
+        VALUES (#{bemail}, #{bpwd},
+        <choose>
+            <when test="userName != null and userName != ''">#{userName}</when>
+            <otherwise>#{bemail}</otherwise>
+        </choose>)
+    </insert>
+
+    <!-- 用户登录验证 -->
+    <select id="login" resultMap="userResultMap">
+        SELECT id, bemail, bpwd, userName
+        FROM busertable
+        WHERE bemail = #{bemail} AND bpwd = #{bpwd}
+    </select>
+
+    <!-- 更新用户信息 -->
+    <update id="update" parameterType="BUser">
+        UPDATE busertable
+        <set>
+            <if test="userName != null and userName != ''">userName = #{userName},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 修改密码 -->
+    <update id="updatePassword">
+        UPDATE busertable
+        SET bpwd = #{newPassword}
+        WHERE id = #{id}
+    </update>
+</mapper>

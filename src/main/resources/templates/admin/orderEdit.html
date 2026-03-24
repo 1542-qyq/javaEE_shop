@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑订单 - 后台管理系统</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f7ff;
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(165, 154, 202, 0.15);
+            border: 2px solid #e6d9ff;
+            position: relative;
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .main-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #a59aca, #d4c5ff, #a59aca);
+        }
+
+        /* 标题区域 */
+        .header-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f0ebff;
+        }
+
+        .header-section h1 {
+            color: #a59aca;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .header-section p {
+            color: #8a7bb0;
+            font-size: 0.95rem;
+        }
+
+        /* 表单容器 */
+        .form-container {
+            margin-top: 1rem;
+        }
+
+        /* 表单行 */
+        .form-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.8rem;
+            gap: 1.5rem;
+        }
+
+        /* 标签样式 */
+        .form-label {
+            width: 120px;
+            padding-top: 0.5rem;
+            color: #5a5560;
+            font-weight: bold;
+            font-size: 1rem;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* 输入区域 */
+        .form-input {
+            flex: 1;
+        }
+
+        /* 输入框通用样式 */
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e6d9ff;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #fcfaff;
+            color: #5a5560;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #a59aca;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(165, 154, 202, 0.2);
+        }
+
+        /* 单选按钮容器 */
+        .radio-group {
+            display: flex;
+            gap: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        /* 单选按钮样式 */
+        .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d4c5ff;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .radio-option input[type="radio"]:checked {
+            border-color: #a59aca;
+            background-color: #a59aca;
+        }
+
+        .radio-option input[type="radio"]:checked::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        .radio-option label {
+            color: #5a5560;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            color: #a59aca;
+            font-weight: bold;
+        }
+
+        /* 按钮容器 */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #f0ebff;
+        }
+
+        /* 按钮通用样式 */
+        .btn {
+            padding: 0.9rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            border: none;
+        }
+
+        .submit-btn {
+            background-color: #a59aca;
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background-color: #8a7bb0;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.3);
+        }
+
+        .back-btn {
+            background-color: #e6d9ff;
+            color: #5a5560;
+            border: 2px solid #d4c5ff;
+        }
+
+        .back-btn:hover {
+            background-color: #d4c5ff;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 2rem 1.5rem;
+                margin-top: 1rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .form-label {
+                width: 100%;
+                text-align: left;
+                padding-top: 0;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* 错误提示样式 */
+        .error-message {
+            color: #ff4757;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .error {
+            border-color: #ff4757 !important;
+        }
+
+        .error .error-message {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <div class="header-section">
+        <h1>编辑订单</h1>
+        <p>修改订单信息</p>
+    </div>
+
+    <form class="form-container" th:action="@{/admin/order/edit}" method="post" th:object="${order}" id="orderForm">
+        <!-- 隐藏ID字段 -->
+        <input type="hidden" th:field="*{id}">
+
+        <div class="form-row">
+            <label class="form-label">用户ID:</label>
+            <div class="form-input">
+                <input type="number" class="form-control" th:field="*{busertableId}"
+                       placeholder="请输入用户ID" required min="1">
+                <div class="error-message">请输入有效的用户ID</div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label class="form-label">订单日期:</label>
+            <div class="form-input">
+                <input type="date" class="form-control" th:field="*{orderDate}"
+                       th:value="${order.orderDate != null} ? ${#dates.format(order.orderDate, 'yyyy-MM-dd')} : ''"
+                       placeholder="请选择订单日期" required>
+                <div class="error-message">请选择订单日期</div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label class="form-label">总价:</label>
+            <div class="form-input">
+                <input type="number" step="0.01" class="form-control" th:field="*{amount}"
+                       placeholder="请输入订单总价" required min="0.01">
+                <div class="error-message">请输入有效的金额（大于0）</div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label for="status" class="form-label">订单状态:</label>
+            <div class="form-input">
+                <select id="status" name="status" th:field="*{status}" class="form-control" required>
+                    <option value="待付款">待付款</option>
+                    <option value="已付款">已付款</option>
+                    <option value="已发货">已发货</option>
+                    <option value="已完成">已完成</option>
+                    <option value="已取消">已取消</option>
+                </select>
+                <div class="error-message">请选择订单状态</div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn submit-btn">保存修改</button>
+            <a th:href="@{/admin/order/list}" class="btn back-btn">返回列表</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    // 前端验证
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('orderForm');
+        const inputs = form.querySelectorAll('input[required]');
+
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+
+            // 清除之前的错误状态
+            inputs.forEach(input => {
+                input.classList.remove('error');
+                const parent = input.closest('.form-input') || input.parentElement;
+                const errorDiv = parent.querySelector('.error-message');
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                }
+            });
+
+            // 验证每个必填字段
+            inputs.forEach(input => {
+                const parent = input.closest('.form-input') || input.parentElement;
+                const errorDiv = parent.querySelector('.error-message');
+
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.classList.add('error');
+                    if (errorDiv) errorDiv.style.display = 'block';
+                } else if (input.type === 'number') {
+                    const value = parseFloat(input.value);
+                    if (isNaN(value) || (input.min && value < parseFloat(input.min))) {
+                        isValid = false;
+                        input.classList.add('error');
+                        if (errorDiv) errorDiv.style.display = 'block';
+                    }
+                }
+            });
+
+            // 验证订单状态
+        const statusSelect = document.getElementById('status');
+        if (!statusSelect.value) {
+            isValid = false;
+            const statusContainer = statusSelect.parentElement;
+            statusContainer.classList.add('error');
+            statusContainer.querySelector('.error-message').style.display = 'block';
+        }
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('请填写所有必填字段并确保数据有效！');
+            }
+        });
+    });
+</script>
+</body>
+</html>

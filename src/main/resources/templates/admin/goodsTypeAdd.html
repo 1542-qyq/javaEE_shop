@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加商品类型 - 后台管理系统</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            background-color: #f9f7ff;
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* 容器 */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 15px 35px rgba(165, 154, 202, 0.2);
+            border: 2px solid #e6d9ff;
+            position: relative;
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #a59aca, #d4c5ff, #a59aca);
+        }
+
+        /* 标题 */
+        h1 {
+            color: #a59aca;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background-color: #ffd6e7;
+            border-radius: 2px;
+        }
+
+        .subtitle {
+            color: #8a7bb0;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        /* 表单样式 */
+        .type-form {
+            margin-top: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #5a5560;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 2px solid #e6d9ff;
+            border-radius: 12px;
+            font-size: 1rem;
+            background-color: #fcfaff;
+            color: #5a5560;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: #a59aca;
+            box-shadow: 0 0 0 3px rgba(165, 154, 202, 0.2);
+            background-color: white;
+        }
+
+        /* 按钮容器 */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* 提交按钮 */
+        .submit-btn {
+            background-color: #a59aca;
+            color: white;
+            padding: 0.9rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+
+        .submit-btn:hover {
+            background-color: #8a7bb0;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.3);
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            background-color: #e6d9ff;
+            color: #5a5560;
+            padding: 0.9rem 2rem;
+            border: 2px solid #d4c5ff;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            min-width: 140px;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background-color: #d4c5ff;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.2);
+        }
+
+        /* 小猫装饰元素 */
+        .cat-decor {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .cat-icon {
+            font-size: 3rem;
+            color: #a59aca;
+            margin-bottom: 0.5rem;
+        }
+
+        .cat-paw {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0.15;
+        }
+
+        .cat-paw:nth-child(1) {
+            top: 15%;
+            left: 8%;
+        }
+
+        .cat-paw:nth-child(2) {
+            top: 20%;
+            right: 7%;
+        }
+
+        .cat-paw:nth-child(3) {
+            bottom: 20%;
+            left: 10%;
+        }
+
+        .cat-paw:nth-child(4) {
+            bottom: 15%;
+            right: 9%;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 640px) {
+            .container {
+                padding: 2rem 1.5rem;
+                margin-top: 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .submit-btn,
+            .back-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .cat-icon {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>添加商品类型</h1>
+    <p class="subtitle">为商品添加新的分类</p>
+
+    <form class="type-form" th:action="@{/admin/type/add}" method="post" th:object="${goodsType}">
+        <div class="form-group">
+            <label for="typename">类型名称:</label>
+            <input type="text"
+                   id="typename"
+                   th:field="*{typename}"
+                   placeholder="请输入商品类型名称"
+                   required>
+        </div>
+
+        <div class="button-group">
+            <input type="submit" class="submit-btn" value="添加类型">
+            <a th:href="@{/admin/type/list}" class="back-btn">返回列表</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

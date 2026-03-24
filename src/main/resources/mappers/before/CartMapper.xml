@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ch.ch9.repository.before.CartRepository">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="cartResultMap" type="Cart">
+        <id property="id" column="id"/>
+        <result property="busertableId" column="busertable_id"/>
+        <result property="goodstableId" column="goodstable_id"/>
+        <result property="shoppingnum" column="shoppingnum"/>
+    </resultMap>
+
+    <!-- 购物车+商品详情结果映射 -->
+    <resultMap id="cartWithGoodsResultMap" type="Cart">
+        <id property="id" column="cart_id"/>
+        <result property="busertableId" column="busertable_id"/>
+        <result property="goodstableId" column="goodstable_id"/>
+        <result property="shoppingnum" column="shoppingnum"/>
+        <!-- 关联商品信息 -->
+        <association property="goods" javaType="com.ch.ch9.entity.Goods">
+            <id property="id" column="goods_id"/>
+            <result property="gname" column="gname"/>
+            <result property="gprice" column="gprice"/>
+            <result property="gstore" column="gstore"/>
+            <result property="gpicture" column="gpicture"/>
+        </association>
+    </resultMap>
+
+    <!-- 添加商品到购物车 -->
+    <insert id="addToCart" parameterType="Cart" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO carttable (busertable_id, goodstable_id, shoppingnum)
+        VALUES (#{busertableId}, #{goodstableId}, #{shoppingnum})
+    </insert>
+
+    <!-- 更新购物车中商品数量 -->
+    <update id="updateQuantity">
+        UPDATE carttable
+        SET shoppingnum = #{quantity}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 从购物车删除商品 -->
+    <delete id="deleteFromCart" parameterType="Integer">
+        DELETE FROM carttable
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 根据用户ID和商品ID查找购物车项 -->
+    <select id="findByUserIdAndGoodsId" resultMap="cartResultMap">
+        SELECT id, busertable_id, goodstable_id, shoppingnum
+        FROM carttable
+        WHERE busertable_id = #{userId} AND goodstable_id = #{goodsId}
+    </select>
+
+    <!-- 根据用户ID查询购物车所有商品（带商品详情） -->
+    <select id="findByUserIdWithGoods" resultMap="cartWithGoodsResultMap">
+        SELECT
+            c.id as cart_id,
+            c.busertable_id,
+            c.goodstable_id,
+            c.shoppingnum,
+            g.id as goods_id,
+            g.gname,
+            g.gprice,
+            g.gstore,
+            g.gpicture
+        FROM carttable c
+                 INNER JOIN goodstable g ON c.goodstable_id = g.id
+        WHERE c.busertable_id = #{userId}
+        ORDER BY c.id DESC
+    </select>
+</mapper>

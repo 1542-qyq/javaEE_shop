@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>错误页面 - 后台管理系统</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f7ff;
+            background-image: 
+                radial-gradient(#e6d9ff 2px, transparent 2px),
+                radial-gradient(#e6d9ff 2px, transparent 2px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 主容器 */
+        .error-container {
+            max-width: 600px;
+            width: 100%;
+            background-color: white;
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 15px 40px rgba(165, 154, 202, 0.2);
+            border: 2px solid #e6d9ff;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .error-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #a59aca, #d4c5ff, #a59aca);
+        }
+        
+        /* 错误图标 */
+        .error-icon {
+            font-size: 4rem;
+            color: #ff6b8b;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+        
+        /* 标题样式 */
+        .error-title {
+            color: #a59aca;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+        
+        .error-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: #ffd6e7;
+            border-radius: 2px;
+        }
+        
+        /* 错误信息 */
+        .error-message {
+            background-color: #fff5f7;
+            border: 2px solid #ffd6e7;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            color: #e74c3c;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            text-align: left;
+        }
+        
+        .error-message h3 {
+            color: #ff6b8b;
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+        }
+        
+        /* 按钮样式 */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+        }
+        
+        .btn {
+            padding: 0.9rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            min-width: 140px;
+            text-align: center;
+            display: inline-block;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        
+        .login-btn {
+            background-color: #a59aca;
+            color: white;
+        }
+        
+        .login-btn:hover {
+            background-color: #8a7bb0;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.3);
+        }
+        
+        .home-btn {
+            background-color: #e6d9ff;
+            color: #5a5560;
+            border-color: #d4c5ff;
+        }
+        
+        .home-btn:hover {
+            background-color: #d4c5ff;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.2);
+        }
+        
+        /* 装饰元素 */
+        .decor-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #e6d9ff;
+            border-radius: 50%;
+        }
+        
+        .decor-dot:nth-child(1) {
+            top: 15%;
+            left: 8%;
+        }
+        
+        .decor-dot:nth-child(2) {
+            top: 20%;
+            right: 8%;
+        }
+        
+        .decor-dot:nth-child(3) {
+            bottom: 20%;
+            left: 10%;
+        }
+        
+        .decor-dot:nth-child(4) {
+            bottom: 15%;
+            right: 10%;
+        }
+        
+        /* 错误代码 */
+        .error-code {
+            color: #b8a9d9;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+            font-style: italic;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .error-container {
+                padding: 2rem 1.5rem;
+            }
+            
+            .error-icon {
+                font-size: 3.5rem;
+            }
+            
+            .error-title {
+                font-size: 1.8rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px 10px;
+            }
+            
+            .error-container {
+                padding: 1.5rem 1.2rem;
+            }
+            
+            .error-title {
+                font-size: 1.6rem;
+            }
+            
+            .error-message {
+                padding: 1.2rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 装饰点 -->
+    <div class="decor-dot"></div>
+    <div class="decor-dot"></div>
+    <div class="decor-dot"></div>
+    <div class="decor-dot"></div>
+
+    <div class="error-container">
+        <div class="error-icon">⚠️</div>
+        
+        <h1 class="error-title">系统异常</h1>
+        
+        <div class="error-message">
+            <h3>错误信息:</h3>
+            <span th:text="${mymessage}">系统出现异常，请联系管理员</span>
+        </div>
+        
+        <div class="action-buttons">
+            <a th:href="@{/admin/toLogin}" class="btn login-btn">重新登录</a>
+            <a th:href="@{/admin}" class="btn home-btn">返回首页</a>
+        </div>
+        
+        <div class="error-code">
+            错误代码:<span th:text="${#dates.createNow().time}"></span>
+        </div>
+    </div>
+</body>
+</html>

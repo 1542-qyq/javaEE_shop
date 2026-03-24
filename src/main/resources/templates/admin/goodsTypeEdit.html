@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑商品类型 - 后台管理系统</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f7ff;
+            background-image:
+                    radial-gradient(#e6d9ff 2px, transparent 2px),
+                    radial渐变(#e6d9ff 2px, transparent 2px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* 容器 */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(165, 154, 202, 0.15);
+            border: 2px solid #e6d9ff;
+            position: relative;
+            overflow: hidden;
+            margin-top: 3rem;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #a59aca, #d4c5ff, #a59aca);
+        }
+
+        /* 标题 */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f0ebff;
+        }
+
+        .page-header h1 {
+            color: #a59aca;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .page-header p {
+            color: #8a7bb0;
+            font-size: 0.95rem;
+        }
+
+        /* 表单样式 */
+        .edit-form {
+            margin-top: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #5a5560;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+            font-size: 1.05rem;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 2px solid #e6d9ff;
+            border-radius: 10px;
+            font-size: 1rem;
+            background-color: #fcfaff;
+            color: #5a5560;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: #a59aca;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(165, 154, 202, 0.2);
+        }
+
+        /* 按钮容器 */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1.2rem;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #f0ebff;
+        }
+
+        /* 提交按钮 */
+        .submit-btn {
+            background-color: #a59aca;
+            color: white;
+            padding: 0.9rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .submit-btn:hover {
+            background-color: #8a7bb0;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.25);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            background-color: #e6d9ff;
+            color: #5a5560;
+            padding: 0.9rem 2rem;
+            border: 2px solid #d4c5ff;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background-color: #d4c5ff;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.15);
+        }
+
+        .back-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* 系统标识 */
+        .system-brand {
+            text-align: center;
+            margin-top: 2rem;
+            color: #b8a9d9;
+            font-size: 0.85rem;
+        }
+
+        /* 装饰元素 */
+        .decor-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #e6d9ff;
+            border-radius: 50%;
+        }
+
+        .decor-dot:nth-child(1) {
+            top: 15%;
+            left: 8%;
+        }
+
+        .decor-dot:nth-child(2) {
+            top: 20%;
+            right: 8%;
+        }
+
+        .decor-dot:nth-child(3) {
+            bottom: 20%;
+            left: 10%;
+        }
+
+        .decor-dot:nth-child(4) {
+            bottom: 15%;
+            right: 10%;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 600px) {
+            .container {
+                padding: 2rem 1.5rem;
+                margin-top: 1.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.6rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .submit-btn,
+            .back-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px 10px;
+            }
+
+            .container {
+                padding: 1.5rem 1.2rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.4rem;
+            }
+        }
+
+        /* 输入框状态提示 */
+        .form-group input[type="text"].error {
+            border-color: #ff6b8b;
+            background-color: #fff5f7;
+        }
+
+        .form-group input[type="text"].error:focus {
+            box-shadow: 0 0 0 3px rgba(255, 107, 139, 0.1);
+        }
+
+        /* 隐藏的ID字段 */
+        input[type="hidden"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<!-- 装饰点 -->
+<div class="decor-dot"></div>
+<div class="decor-dot"></div>
+<div class="decor-dot"></div>
+<div class="decor-dot"></div>
+
+<div class="container">
+    <div class="page-header">
+        <h1>编辑商品类型</h1>
+        <p>修改商品分类信息</p>
+    </div>
+
+    <form class="edit-form" th:action="@{/admin/type/edit}" method="post" th:object="${goodsType}">
+        <input type="hidden" th:field="*{id}">
+
+        <div class="form-group">
+            <label for="typename">类型名称:</label>
+            <input type="text"
+                   id="typename"
+                   th:field="*{typename}"
+                   placeholder="请输入类型名称"
+                   required>
+        </div>
+
+        <div class="button-group">
+            <input type="submit" class="submit-btn" value="保存">
+            <a th:href="@{/admin/type/list}" class="back-btn">返回列表</a>
+        </div>
+    </form>
+
+    <div class="system-brand">
+        后台管理系统 | 01-邱彦琦
+    </div>
+</div>
+</body>
+</html>

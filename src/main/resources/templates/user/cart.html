@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的购物车</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/userIndex.css}"/>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f7ff;
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(165, 154, 202, 0.15);
+            border: 2px solid #e6d9ff;
+            position: relative;
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .main-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #a59aca, #d4c5ff, #a59aca);
+        }
+
+        /* 标题区域 */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f0ebff;
+        }
+
+        .title-group h1 {
+            color: #a59aca;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .title-group p {
+            color: #8a7bb0;
+            font-size: 0.95rem;
+        }
+
+        /* 按钮样式 */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #a59aca;
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #8a7bb0;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background-color: #e6d9ff;
+            color: #5a5560;
+            border-color: #d4c5ff;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d4c5ff;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.2);
+            color: #5a5560;
+            text-decoration: none;
+        }
+
+        .btn-danger {
+            background-color: #ff6b8b;
+            color: white;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #ff5577;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(255, 107, 139, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* 导航栏样式调整 */
+        .navbar {
+            background: linear-gradient(90deg, #a59aca, #8a7bb0) !important;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 0.8rem 1rem;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+            font-size: 1.4rem;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white !important;
+        }
+
+        .badge-danger {
+            background-color: #ff6b8b !important;
+        }
+
+        /* 购物车商品容器 */
+        .cart-items-container {
+            margin-top: 1rem;
+            border-radius: 10px;
+            border: 1px solid #f0ebff;
+            overflow: hidden;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #f0ebff;
+            transition: background-color 0.2s ease;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item:hover {
+            background-color: #fcfaff;
+        }
+
+        .cart-item-image {
+            width: 120px;
+            height: 120px;
+            overflow: hidden;
+            margin-right: 2rem;
+            border-radius: 10px;
+            border: 2px solid #e6d9ff;
+        }
+
+        .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cart-item-info {
+            flex: 1;
+            padding-right: 2rem;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #5a5560;
+            margin-bottom: 0.5rem;
+        }
+
+        .cart-item-name a {
+            color: #5a5560;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .cart-item-name a:hover {
+            color: #a59aca;
+        }
+
+        .cart-item-price {
+            color: #ff6b8b;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .cart-item-stock {
+            color: #8a7bb0;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* 数量选择器 */
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .quantity-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid #e6d9ff;
+            background-color: #fcfaff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #8a7bb0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background-color: #e6d9ff;
+            border-color: #a59aca;
+        }
+
+        .quantity-input {
+            width: 60px;
+            height: 36px;
+            border: 2px solid #e6d9ff;
+            background-color: #fcfaff;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1rem;
+            color: #5a5560;
+            margin: 0 5px;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: #a59aca;
+        }
+
+        /* 小计 */
+        .cart-item-subtotal {
+            font-weight: bold;
+            color: #ff6b8b;
+            font-size: 1.3rem;
+            margin: 0 30px;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        /* 操作按钮 */
+        .cart-item-actions {
+            margin-left: 20px;
+        }
+
+        .btn-remove {
+            padding: 0.6rem 1.2rem;
+            background-color: #ffd6e7;
+            color: #ff6b8b;
+            border: 2px solid #ffc1d6;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        .btn-remove:hover {
+            background-color: #ffc1d6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 107, 139, 0.2);
+        }
+
+        /* 购物车汇总 */
+        .cart-summary {
+            background-color: #fcfaff;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 2px solid #e6d9ff;
+            margin-top: 2rem;
+        }
+
+        .total-amount {
+            font-size: 2rem;
+            color: #ff6b8b;
+            font-weight: bold;
+            text-align: right;
+            margin-bottom: 1.5rem;
+        }
+
+        /* 空购物车状态 */
+        .empty-cart {
+            text-align: center;
+            padding: 4rem 2rem;
+            background-color: #fcfaff;
+            border-radius: 12px;
+            border: 2px dashed #e6d9ff;
+            margin-top: 2rem;
+        }
+
+        .empty-cart-icon {
+            font-size: 4rem;
+            color: #d4c5ff;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-cart h3 {
+            color: #a59aca;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .empty-cart p {
+            color: #8a7bb0;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* 面包屑导航 */
+        .breadcrumb {
+            background-color: #fcfaff;
+            border-radius: 8px;
+            padding: 0.8rem 1.5rem;
+            border: 1px solid #e6d9ff;
+            margin-bottom: 1.5rem;
+        }
+
+        .breadcrumb-item a {
+            color: #a59aca;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .breadcrumb-item.active {
+            color: #8a7bb0;
+        }
+
+        /* 搜索框样式调整 */
+        .form-inline .form-control {
+            border: 2px solid #e6d9ff;
+            background-color: #fcfaff;
+            border-radius: 8px;
+        }
+
+        .form-inline .btn-outline-success {
+            border: 2px solid #a59aca;
+            color: #a59aca;
+            border-radius: 8px;
+        }
+
+        .form-inline .btn-outline-success:hover {
+            background-color: #a59aca;
+            color: white;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 992px) {
+            .main-container {
+                padding: 2rem 1.5rem;
+                margin-top: 1rem;
+            }
+
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+
+            .button-group {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+
+            .cart-item-image {
+                margin-right: 0;
+            }
+
+            .cart-item-info {
+                padding-right: 0;
+            }
+
+            .cart-item-subtotal, .cart-item-actions {
+                align-self: flex-end;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                min-width: auto;
+            }
+
+            .cart-summary .row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .cart-summary .col-md-6 {
+                width: 100%;
+                text-align: center !important;
+            }
+
+            .cart-item-actions {
+                margin-left: 0;
+                margin-top: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .main-container {
+                padding: 1.5rem 1rem;
+            }
+
+            .title-group h1 {
+                font-size: 1.6rem;
+            }
+
+            .cart-item {
+                padding: 1rem;
+            }
+
+            .cart-item-image {
+                width: 100px;
+                height: 100px;
+            }
+
+            .cart-item-subtotal {
+                margin: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg cat-navbar">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">电商平台</a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- 用户菜单 -->
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/goods/list}" >
+                        商品列表
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/cart/view}">
+                        购物车
+                    </a>
+                </li>
+            </ul>
+            <!-- 登录/退出 -->
+            <ul class="navbar-nav ml-3">
+                <li class="nav-item" th:unless="${session.buser != null}">
+                    <a class="nav-link" th:href="@{/user/toLogin}">
+                        登录
+                    </a>
+                </li>
+                <li class="nav-item" th:if="${session.buser != null}">
+                    <a class="nav-link" th:href="@{/user/logout}">
+                        退出
+                    </a>
+                </li>
+                <!-- 后台管理入口 -->
+                <a class="nav-link" th:href="@{/admin/toLogin}">
+                    后台管理
+                </a>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="main-container">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">首页</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/goods/list}">商品列表</a></li>
+            <li class="breadcrumb-item active">我的购物车</li>
+        </ol>
+    </nav>
+
+    <!-- 购物车头部 -->
+    <div class="header-section">
+        <div class="title-group">
+            <h1>我的购物车</h1>
+            <p>您当前有 <span th:text="${itemCount}"></span> 件商品</p>
+        </div>
+    </div>
+
+    <!-- 购物车商品列表 -->
+    <div th:if="${itemCount > 0}">
+        <div class="cart-items-container">
+            <div th:each="cartItem : ${cartItems}" class="cart-item" th:id="'cart-item-' + ${cartItem.id}">
+                <!-- 商品图片 -->
+                <div class="cart-item-image">
+                    <a th:href="@{/goods/detail/{id}(id=${cartItem.goods.id})}">
+                        <img th:src="${cartItem.goods.imageUrl}"
+                             th:alt="${cartItem.goods.gname}">
+                    </a>
+                </div>
+
+                <!-- 商品信息 -->
+                <div class="cart-item-info">
+                    <div class="cart-item-name">
+                        <a th:href="@{/goods/detail/{id}(id=${cartItem.goods.id})}"
+                           th:text="${cartItem.goods.gname}"></a>
+                    </div>
+                    <div class="cart-item-price">
+                        单价：¥<span th:text="${cartItem.goods.gprice}"></span>
+                    </div>
+
+                    <!-- 数量选择 -->
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn" th:onclick="'decreaseQuantity('+${cartItem.id}+')'">-</button>
+                        <input type="text" class="quantity-input"
+                               th:id="'quantity-' + ${cartItem.id}"
+                               th:value="${cartItem.shoppingnum}"
+                               th:onchange="'updateQuantity('+${cartItem.id}+')'">
+                        <button class="quantity-btn" th:onclick="'increaseQuantity('+${cartItem.id}+')'">+</button>
+                        <span class="text-muted ml-3">库存：<span th:text="${cartItem.goods.gstore}"></span> 件</span>
+                    </div>
+                </div>
+
+                <!-- 小计 -->
+                <div class="cart-item-subtotal">
+                    ¥<span th:text="${#numbers.formatDecimal(cartItem.subtotal, 1, 2)}"></span>
+                </div>
+
+                <!-- 删除按钮 -->
+                <div class="cart-item-actions">
+                    <button class="btn btn-sm btn-remove"
+                            th:onclick="'deleteFromCart('+${cartItem.id}+')'">
+                        删除
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 购物车汇总 -->
+        <div class="cart-summary">
+            <div class="row">
+                <div class="col-md-6">
+                    <a th:href="@{/goods/list}" class="btn btn-outline-primary">
+                        继续购物
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <div class="total-amount">
+                        合计：¥<span th:text="${#numbers.formatDecimal(totalAmount, 1, 2)}"></span>
+                    </div>
+                    <div class="text-right mt-3">
+                        <a th:href="@{/order/confirm}" class="btn btn-danger btn-lg"
+                           th:if="${itemCount > 0}">
+                            去结算
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 空购物车提示 -->
+    <div th:if="${itemCount == 0}" class="empty-cart">
+        <div class="empty-cart-icon">🛒</div>
+        <h3>购物车是空的</h3>
+        <p class="text-muted mt-3">您还没有添加任何商品到购物车</p>
+        <a th:href="@{/goods/list}" class="btn btn-primary btn-lg mt-3">
+            去逛逛
+        </a>
+    </div>
+</div>
+<!-- 页脚 -->
+<footer class="bg-dark text-white py-4 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>电商平台</h5>
+                <p class="text-light">为您提供优质的商品和服务</p>
+            </div>
+            <div class="col-md-6 text-right">
+                <p>© 2025 电商平台. -23覃海霞-01邱彦琦-.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script>
+    // 减少数量
+    function decreaseQuantity(cartId) {
+        var input = $('#quantity-' + cartId);
+        var currentQuantity = parseInt(input.val());
+
+        if (currentQuantity > 1) {
+            updateCartQuantity(cartId, currentQuantity - 1);
+        }
+    }
+
+    // 增加数量
+    function increaseQuantity(cartId) {
+        var input = $('#quantity-' + cartId);
+        var currentQuantity = parseInt(input.val());
+
+        updateCartQuantity(cartId, currentQuantity + 1);
+    }
+
+    // 手动输入数量
+    function updateQuantity(cartId) {
+        var input = $('#quantity-' + cartId);
+        var newQuantity = parseInt(input.val());
+
+        if (newQuantity > 0) {
+            updateCartQuantity(cartId, newQuantity);
+        } else {
+            input.val(1);
+            alert('数量必须大于0');
+        }
+    }
+
+    // 更新购物车数量（AJAX）
+    function updateCartQuantity(cartId, quantity) {
+        $.ajax({
+            url: '[[@{/cart/update}]]',
+            type: 'POST',
+            data: {
+                cartId: cartId,
+                quantity: quantity
+            },
+            success: function(response) {
+                var parts = response.split(':');
+                var type = parts[0];
+                var message = parts[1];
+
+                if (type === 'success') {
+                    // 刷新页面以更新总价
+                    window.location.reload();
+                } else {
+                    alert('错误：' + message);
+                    window.location.reload();
+                }
+            },
+            error: function() {
+                alert('网络错误，请稍后重试');
+            }
+        });
+    }
+
+    // 从购物车删除商品
+    function deleteFromCart(cartId) {
+        if (!confirm('确定要删除这个商品吗？')) {
+            return;
+        }
+
+        $.ajax({
+            url: '[[@{/cart/delete}]]',
+            type: 'POST',
+            data: {
+                cartId: cartId
+            },
+            success: function(response) {
+                var parts = response.split(':');
+                var type = parts[0];
+                var message = parts[1];
+
+                if (type === 'success') {
+                    // 从页面移除该商品项
+                    $('#cart-item-' + cartId).remove();
+
+                    // 刷新页面以更新总价和数量
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 300);
+                } else {
+                    alert('错误：' + message);
+                }
+            },
+            error: function() {
+                alert('网络错误，请稍后重试');
+            }
+        });
+    }
+
+    // 结算功能（待实现）
+    function checkout() {
+        // 检查购物车是否有商品
+        var itemCount = [[${itemCount}]];
+        if (itemCount === 0) {
+            alert('购物车为空，无法结算');
+            return;
+        }
+
+        alert('结算功能正在开发中...');
+        // 这里可以跳转到订单确认页面
+        // window.location.href = '/order/checkout';
+    }
+
+    // 页面加载时初始化
+    $(document).ready(function() {
+        // 输入框验证
+        $('.quantity-input').on('input', function() {
+            var value = $(this).val();
+            if (!/^\d+$/.test(value)) {
+                $(this).val('1');
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>用户列表 - 后台管理系统</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f7ff;
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(165, 154, 202, 0.15);
+            border: 2px solid #e6d9ff;
+            position: relative;
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .main-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #a59aca, #d4c5ff, #a59aca);
+        }
+
+        /* 标题区域 */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f0ebff;
+        }
+
+        .title-group h1 {
+            color: #a59aca;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .title-group p {
+            color: #8a7bb0;
+            font-size: 0.95rem;
+        }
+
+        /* 按钮样式 */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background-color: #a59aca;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #8a7bb0;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #e6d9ff;
+            color: #5a5560;
+            border-color: #d4c5ff;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d4c5ff;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.2);
+        }
+
+        /* 表格样式 */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+            border-radius: 10px;
+            border: 1px solid #f0ebff;
+        }
+
+        .styled-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .styled-table thead {
+            background: linear-gradient(90deg, #a59aca, #8a7bb0);
+        }
+
+        .styled-table th {
+            color: white;
+            font-weight: bold;
+            padding: 1.2rem 1rem;
+            text-align: left;
+            font-size: 1rem;
+            border: none;
+        }
+
+        .styled-table th:first-child {
+            padding-left: 1.5rem;
+        }
+
+        .styled-table th:last-child {
+            padding-right: 1.5rem;
+        }
+
+        .styled-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .styled-table tbody tr:nth-child(even) {
+            background-color: #fcfaff;
+        }
+
+        .styled-table tbody tr:nth-child(odd) {
+            background-color: white;
+        }
+
+        .styled-table tbody tr:hover {
+            background-color: #f0ebff;
+        }
+
+        .styled-table td {
+            padding: 1rem;
+            color: #5a5560;
+            border-bottom: 1px solid #f0ebff;
+            font-size: 0.95rem;
+            vertical-align: middle;
+        }
+
+        .styled-table td:first-child {
+            padding-left: 1.5rem;
+            font-weight: bold;
+            color: #a59aca;
+        }
+
+        .styled-table td:last-child {
+            padding-right: 1.5rem;
+        }
+
+        /* 密码显示样式 */
+        .password-cell {
+            font-family: monospace;
+            letter-spacing: 1px;
+            color: #8a7bb0;
+        }
+
+        /* 邮箱样式 */
+        .email-cell {
+            color: #3498db;
+        }
+
+        /* 操作按钮 */
+        .action-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            min-width: 60px;
+        }
+
+        .action-btn.edit-btn {
+            background-color: #a59aca;
+            color: white;
+        }
+
+        .action-btn.edit-btn:hover {
+            background-color: #8a7bb0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(165, 154, 202, 0.2);
+        }
+
+        .action-btn.delete-btn {
+            background-color: #ffd6e7;
+            color: #ff6b8b;
+            border: 1px solid #ffc1d6;
+        }
+
+        .action-btn.delete-btn:hover {
+            background-color: #ffc1d6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 107, 139, 0.2);
+        }
+
+        /* 空状态提示 */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #b8a9d9;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+
+        .decor-dot:nth-child(1) {
+            top: 10%;
+            left: 5%;
+        }
+
+        .decor-dot:nth-child(2) {
+            top: 15%;
+            right: 5%;
+        }
+
+        .decor-dot:nth-child(3) {
+            bottom: 15%;
+            left: 7%;
+        }
+
+        .decor-dot:nth-child(4) {
+            bottom: 10%;
+            right: 7%;
+        }
+
+        /* 底部按钮 */
+        .footer-buttons {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            z-index: 10;
+        }
+
+        .home-btn {
+            padding: 0.8rem 1.5rem;
+            background-color: #f0ebff;
+            color: #8a7bb0;
+            border: 2px solid #e6d9ff;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 120px;
+        }
+
+        .home-btn:hover {
+            background-color: #e6d9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(165, 154, 202, 0.2);
+        }
+
+        .home-btn::before {
+            font-size: 1rem;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 992px) {
+            .main-container {
+                padding: 2rem 1.5rem;
+                margin-top: 1rem;
+            }
+
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+
+            .button-group {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                min-width: auto;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .action-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .footer-buttons {
+                position: static;
+                text-align: center;
+                margin-top: 2rem;
+                padding-top: 1.5rem;
+                border-top: 2px solid #f0ebff;
+            }
+
+            .home-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .main-container {
+                padding: 1.5rem 1rem;
+            }
+
+            .title-group h1 {
+                font-size: 1.6rem;
+            }
+
+            .styled-table th,
+            .styled-table td {
+                padding: 0.8rem 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="main-container">
+    <div class="header-section">
+        <div class="title-group">
+            <h1>用户列表</h1>
+            <p>管理系统中的所有用户</p>
+        </div>
+
+        <div class="button-group">
+            <a th:href="@{/admin/user/toAdd}" class="btn btn-primary">
+                添加用户
+            </a>
+            <a th:href="@{/admin}" class="btn home-btn">
+                返回首页
+            </a>
+        </div>
+    </div>
+
+    <!-- 查询表单 -->
+    <div class="search-section" style="margin-bottom: 20px; padding: 15px; background-color: #fcfaff; border-radius: 10px; border: 1px solid #e6d9ff;">
+        <form th:action="@{/admin/user/list}" method="get" style="display: flex; gap: 10px; align-items: center;">
+            <div>
+                <label for="userName" style="font-weight: bold; color: #a59aca; margin-right: 5px;">用户名:</label>
+                <input type="text" id="userName" name="userName" th:value="${userName}"
+                       style="padding: 8px 12px; border: 2px solid #e6d9ff; border-radius: 8px; font-size: 14px; width: 200px;">
+            </div>
+            <button type="submit" style="padding: 8px 16px; background-color: #a59aca; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                查询
+            </button>
+            <a th:href="@{/admin/user/list}" style="padding: 8px 16px; background-color: #e6d9ff; color: #5a5560; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                重置
+            </a>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <table class="styled-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>用户名</th>
+                <th>密码</th>
+                <th>邮箱</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- 有用户数据时显示 -->
+            <th:block th:if="${!#lists.isEmpty(userList)}">
+                <tr th:each="user : ${userList}">
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.userName}"></td>
+                    <td class="password-cell">********</td>
+                    <td class="email-cell" th:text="${user.bemail}"></td>
+                    <td>
+                        <div class="action-buttons">
+                            <a th:href="@{/admin/user/toEdit/{id}(id=${user.id})}" class="action-btn edit-btn">编辑</a>
+                            <a th:href="@{/admin/user/delete/{id}(id=${user.id})}" class="action-btn delete-btn"
+                               onclick="return confirm('确定要删除该用户吗？');">删除</a>
+                        </div>
+                    </td>
+                </tr>
+            </th:block>
+            <!-- 空状态提示 -->
+            <tr th:if="${#lists.isEmpty(userList)}">
+                <td colspan="5">
+                    <div class="empty-state">
+                        <p>暂无用户信息</p>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+</body>
+</html>

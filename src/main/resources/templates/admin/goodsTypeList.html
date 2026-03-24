@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商品类型列表 - 后台管理系统</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            background-color: #f9f7ff;
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 15px 35px rgba(165, 154, 202, 0.2);
+            border: 2px solid #e6d9ff;
+            position: relative;
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .main-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #a59aca, #d4c5ff, #a59aca);
+        }
+
+        /* 标题区域 */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f0ebff;
+        }
+
+        .title-group h1 {
+            color: #a59aca;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .title-group h1::before {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+
+        .title-group p {
+            color: #8a7bb0;
+            font-size: 1rem;
+        }
+
+        /* 按钮样式 */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background-color: #a59aca;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #8a7bb0;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #e6d9ff;
+            color: #5a5560;
+            border-color: #d4c5ff;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d4c5ff;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.2);
+        }
+
+        /* 表格样式 */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        .styled-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(165, 154, 202, 0.1);
+        }
+
+        .styled-table thead {
+            background: linear-gradient(90deg, #a59aca, #8a7bb0);
+        }
+
+        .styled-table th {
+            color: white;
+            font-weight: bold;
+            padding: 1.2rem 1rem;
+            text-align: left;
+            font-size: 1.1rem;
+            border: none;
+        }
+
+        .styled-table th:first-child {
+            padding-left: 1.5rem;
+        }
+
+        .styled-table th:last-child {
+            padding-right: 1.5rem;
+        }
+
+        .styled-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .styled-table tbody tr:nth-child(even) {
+            background-color: #fcfaff;
+        }
+
+        .styled-table tbody tr:nth-child(odd) {
+            background-color: white;
+        }
+
+        .styled-table tbody tr:hover {
+            background-color: #f0ebff;
+        }
+
+        .styled-table td {
+            padding: 1rem;
+            color: #5a5560;
+            border-bottom: 1px solid #f0ebff;
+            font-size: 1rem;
+        }
+
+        .styled-table td:first-child {
+            padding-left: 1.5rem;
+            font-weight: bold;
+            color: #a59aca;
+        }
+
+        .styled-table td:last-child {
+            padding-right: 1.5rem;
+        }
+
+        /* 操作按钮 */
+        .action-buttons {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-btn.edit-btn {
+            background-color: #a59aca;
+            color: white;
+        }
+
+        .action-btn.edit-btn:hover {
+            background-color: #8a7bb0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(165, 154, 202, 0.2);
+        }
+
+        .action-btn.delete-btn {
+            background-color: #ffd6e7;
+            color: #ff6b8b;
+            border: 1px solid #ffc1d6;
+        }
+
+        .action-btn.delete-btn:hover {
+            background-color: #ffc1d6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 107, 139, 0.2);
+        }
+
+        /* 空状态提示 */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #b8a9d9;
+        }
+
+        .empty-state .cat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+        }
+
+        /* 小猫爪子装饰 */
+        .cat-paw {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0.1;
+        }
+
+        .cat-paw:nth-child(1) {
+            top: 10%;
+            left: 5%;
+        }
+
+        .cat-paw:nth-child(2) {
+            top: 15%;
+            right: 4%;
+        }
+
+        .cat-paw:nth-child(3) {
+            bottom: 15%;
+            left: 7%;
+        }
+
+        .cat-paw:nth-child(4) {
+            bottom: 10%;
+            right: 6%;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 2rem 1.5rem;
+                margin-top: 1rem;
+            }
+
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+
+            .button-group {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .btn {
+                flex: 1;
+                min-width: auto;
+            }
+
+            .styled-table th,
+            .styled-table td {
+                padding: 0.8rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .action-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .main-container {
+                padding: 1.5rem 1rem;
+            }
+
+            .title-group h1 {
+                font-size: 1.6rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="header-section">
+        <div class="title-group">
+            <h1>商品类型列表</h1>
+            <p>管理系统中的商品类型信息</p>
+        </div>
+
+        <div class="button-group">
+            <a th:href="@{/admin/type/toAdd}" class="btn btn-primary">
+                添加商品类型
+            </a>
+            <a th:href="@{/admin}" class="btn btn-secondary">
+                返回首页
+            </a>
+        </div>
+    </div>
+    
+    <!-- 查询表单 -->
+    <div class="search-section" style="margin-bottom: 20px; padding: 15px; background-color: #fcfaff; border-radius: 10px; border: 1px solid #e6d9ff;">
+        <form th:action="@{/admin/type/list}" method="get" style="display: flex; gap: 10px; align-items: center;">
+            <div>
+                <label for="tname" style="font-weight: bold; color: #a59aca; margin-right: 5px;">类型名称:</label>
+                <input type="text" id="tname" name="tname" th:value="${tname}" 
+                       style="padding: 8px 12px; border: 2px solid #e6d9ff; border-radius: 8px; font-size: 14px; width: 200px;">
+            </div>
+            <button type="submit" style="padding: 8px 16px; background-color: #a59aca; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                查询
+            </button>
+            <a th:href="@{/admin/type/list}" style="padding: 8px 16px; background-color: #e6d9ff; color: #5a5560; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                重置
+            </a>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <table class="styled-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>类型名称</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="type : ${goodsTypeList}" th:if="${!#lists.isEmpty(goodsTypeList)}">
+                <td th:text="${type.id}"></td>
+                <td th:text="${type.typename}"></td>
+                <td>
+                    <div class="action-buttons">
+                        <a th:href="@{/admin/type/toEdit(id=${type.id})}" class="action-btn edit-btn">编辑</a>
+                        <a th:href="@{/admin/type/delete(id=${type.id})}" class="action-btn delete-btn">删除</a>
+                    </div>
+                </td>
+            </tr>
+            <!-- 空状态提示 -->
+            <tr th:if="${#lists.isEmpty(goodsTypeList)}">
+                <td colspan="3">
+                    <div class="empty-state">
+                        <p>暂无商品类型，请先添加</p>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

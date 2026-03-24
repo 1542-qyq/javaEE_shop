@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ch.ch9.repository.before.GoodsRepository">
+
+    <!-- 结果映射 -->
+    <resultMap id="goodsResultMap" type="Goods">
+        <id property="id" column="id"/>
+        <result property="gname" column="gname"/>
+        <result property="gprice" column="gprice"/>
+        <result property="gstore" column="gstore"/>
+        <result property="gpicture" column="gpicture"/>
+        <result property="goodstypeId" column="goodstype_id"/>
+        <!-- 关联商品类型表查询类型名称 -->
+        <result property="typename" column="typename"/>
+    </resultMap>
+
+    <!-- 查询所有商品（带分页） -->
+    <select id="findAll" resultMap="goodsResultMap">
+        SELECT g.*, gt.typename
+        FROM goodstable g
+        LEFT JOIN goodstypetable gt ON g.goodstype_id = gt.id
+        WHERE 1=1
+        ORDER BY g.id DESC
+        <if test="start != null and pageSize != null">
+            LIMIT #{start}, #{pageSize}
+        </if>
+    </select>
+
+    <!-- 根据ID查询商品详情 -->
+    <select id="findById" parameterType="Integer" resultMap="goodsResultMap">
+        SELECT g.*, gt.typename
+        FROM goodstable g
+                 LEFT JOIN goodstypetable gt ON g.goodstype_id = gt.id
+        WHERE g.id = #{id}
+    </select>
+
+    <!-- 根据商品名称模糊查询 -->
+    <select id="searchByName" resultMap="goodsResultMap">
+        SELECT g.*, gt.typename
+        FROM goodstable g
+                 LEFT JOIN goodstypetable gt ON g.goodstype_id = gt.id
+        WHERE g.gname LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY g.id DESC
+    </select>
+
+    <!-- 查询商品总数 -->
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM goodstable
+    </select>
+
+</mapper>

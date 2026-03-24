@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的订单</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/userIndex.css}"/>
+    <style>
+        .orders-container {
+            margin-top: 20px;
+        }
+        .order-card {
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .order-info {
+            padding: 20px;
+        }
+        .order-summary {
+            text-align: right;
+        }
+        .empty-orders {
+            text-align: center;
+            padding: 60px 0;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(165, 154, 202, 0.08);
+        }
+        .empty-orders-icon {
+            font-size: 80px;
+            color: #e6d9ff;
+            margin-bottom: 20px;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-paid {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        .status-shipped {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        /* 面包屑导航样式 */
+        .breadcrumb {
+            background-color: transparent;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0.25rem;
+            font-size: 14px;
+        }
+        .breadcrumb-item.active {
+            color: #a59aca;
+            font-weight: bold;
+        }
+        .breadcrumb-item a {
+            color: #6c757d;
+        }
+        .breadcrumb-item a:hover {
+            color: #a59aca;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg cat-navbar">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">电商平台</a>
+
+        <!-- 折叠按钮 -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- 搜索框 -->
+            <form class="form-inline my-2 my-lg-0 ml-auto mr-auto" th:action="@{/goods/search}" method="get" style="margin-bottom: 1rem !important;">
+                <input class="form-control mr-sm-2" type="search"
+                       name="keyword" placeholder="搜索商品..." style="width: 250px; border-radius: 30px;">
+                <button class="btn btn-primary my-2 my-sm-0" type="submit" style="margin-left: 0.5rem;">搜索</button>
+            </form>
+
+            <!-- 导航链接 -->
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/goods/list}">商品列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/cart/view}">购物车</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link current-page" th:href="@{/order/myOrders}">我的订单</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/profile}" th:if="${session.buser != null}">
+                        个人中心
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/toLogin}" th:unless="${session.buser != null}">
+                        登录
+                    </a>
+                </li>
+                <!-- 后台管理入口 -->
+                <li class="nav-item" th:if="${session.auser != null}">
+                    <a class="nav-link" th:href="@{/admin/index}">
+                        后台管理
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container orders-container">
+    <!-- 面包屑导航 -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/}">首页</a></li>
+            <li class="breadcrumb-item active">我的订单</li>
+        </ol>
+    </nav>
+
+    <!-- 订单头部 -->
+    <div class="card orders-header">
+        <div class="card-body">
+            <h3>我的订单</h3>
+            <p class="text-muted">您共有 <span th:text="${orderCount}"></span> 个订单</p>
+        </div>
+    </div>
+
+    <!-- 订单列表 -->
+    <div th:if="${orderCount > 0}">
+        <div th:each="order : ${orders}" class="card order-card">
+            <!-- 订单头部 -->
+            <div class="card-header order-header">
+                <div>
+                    <span class="font-weight-bold">订单号:</span>
+                    <span th:text="${order.id}"></span>
+                    <span class="ml-3">
+                            <span class="font-weight-bold">下单时间:</span>
+                            <span th:text="${order.formattedOrderDate}"></span>
+                        </span>
+                </div>
+                <div>
+                <span th:class="'badge badge-' + ${order.statusColor}"
+                      style="padding: 5px 10px; font-size: 14px;">
+                    [[${order.status}]]
+                </span>
+            </div>
+            </div>
+
+            <!-- 订单信息 -->
+            <div class="card-body order-info">
+                <!-- 简化版，只显示基本信息 -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>订单金额:</strong>
+                            ¥<span th:text="${#numbers.formatDecimal(order.amount, 1, 2)}"></span>
+                        </p>
+                        <p><strong>订单状态:</strong>
+                            <span th:text="${order.status}"></span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>收货人:</strong>
+                            <span th:text="${order.userName != null ? order.userName : '未设置'}"></span>
+                        </p>
+                        <p><strong>联系方式:</strong>
+                            <span th:text="${order.userEmail}"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 订单操作 -->
+            <div class="card-footer order-summary">
+                <button th:if="${order.status == '待付款'}"
+                        class="btn btn-danger btn-sm ml-2"
+                        th:onclick="'payOrder('+ ${order.id} +')'">
+                    立即支付
+                </button>
+                <button th:if="${order.status == '待付款'}"
+                        class="btn btn-outline-secondary btn-sm ml-2"
+                        th:onclick="'cancelOrder('+ ${order.id} +')'">
+                    取消订单
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 空订单提示 -->
+    <div th:if="${orderCount == 0}" class="empty-orders">
+        <div class="empty-orders-icon">📦</div>
+        <h3>暂无订单</h3>
+        <p class="text-muted mt-3">您还没有创建任何订单</p>
+        <a th:href="@{/goods/list}" class="btn btn-primary btn-lg mt-3">
+            去购物
+        </a>
+    </div>
+</div>
+
+<!-- 页脚 -->
+<footer class="bg-dark text-white py-4 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>电商平台</h5>
+                <p class="text-light">为您提供优质的商品和服务</p>
+            </div>
+            <div class="col-md-6 text-right">
+                <p>© 2025 电商平台. -23覃海霞-01邱彦琦-.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+<div id="problems_and_diagnostics" style="margin: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border-left: 4px solid #a59aca;">
+    <h4 style="color: #a59aca; margin-bottom: 15px;">订单诊断信息</h4>
+
+    <!-- 基本统计信息 -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <strong>订单总数:</strong> <span th:text="${orderCount}" class="text-primary"></span>
+        </div>
+        <div class="col-md-3">
+            <strong>当前时间:</strong> <span th:text="${#dates.format(new java.util.Date(), 'yyyy-MM-dd HH:mm:ss')}" class="text-muted"></span>
+        </div>
+        <div class="col-md-3">
+            <strong>页面路径:</strong> <span style="font-family: monospace; font-size: 12px;">/order/myOrders</span>
+        </div>
+    </div>
+
+    <!-- 订单详情表格 -->
+    <div th:if="${orderCount > 0}">
+        <h5 style="margin-bottom: 10px;">订单详情:</h5>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered table-hover" style="margin-top: 10px; font-size: 14px;">
+                <thead class="thead-light">
+                <tr>
+                    <th>订单ID</th>
+                    <th>状态</th>
+                    <th>状态颜色</th>
+                    <th>下单时间</th>
+                    <th>总金额</th>
+                    <th>用户ID</th>
+                    <th>收货人</th>
+                    <th>联系方式</th>
+                    <th>可操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orders}" th:class="'order-row-' + ${order.id}">
+                    <td th:text="${order.id}" class="font-weight-bold"></td>
+                    <td th:text="${order.status}"></td>
+                    <td>
+                            <span th:class="'badge badge-' + ${order.statusColor}" style="padding: 5px 10px;">
+                                [[${order.statusColor}]]
+                            </span>
+                    </td>
+                    <td th:text="${order.formattedOrderDate}"></td>
+                    <td th:text="${#numbers.formatDecimal(order.amount, 1, 2)}" class="text-right"></td>
+                    <td th:text="${order.busertableId}"></td>
+                    <td th:text="${order.userName != null ? order.userName : '未设置'}"></td>
+                    <td th:text="${order.userEmail}"></td>
+                    <td>
+                        <span th:if="${order.status == '待付款'}" class="text-success">支付/取消</span>
+                        <span th:else="" class="text-muted">已完成</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 无订单提示 -->
+    <div th:unless="${orderCount > 0}" class="alert alert-info" role="alert">
+        当前没有订单数据。
+    </div>
+
+    <!-- 状态颜色说明 -->
+    <div class="mt-4">
+        <h6>状态颜色说明:</h6>
+        <div class="row mt-2">
+            <div class="col-3 col-md-2 mb-1">
+                <span class="badge badge-warning">warning</span> - 待付款
+            </div>
+            <div class="col-3 col-md-2 mb-1">
+                <span class="badge badge-info">info</span> - 待发货
+            </div>
+            <div class="col-3 col-md-2 mb-1">
+                <span class="badge badge-primary">primary</span> - 已发货
+            </div>
+            <div class="col-3 col-md-2 mb-1">
+                <span class="badge badge-success">success</span> - 已完成
+            </div>
+            <div class="col-3 col-md-2 mb-1">
+                <span class="badge badge-danger">danger</span> - 已取消
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+<script>
+    // 支付订单
+    function payOrder(orderId) {
+        if (confirm('确认要支付此订单吗？')) {
+            const payButton = event.target;
+            const originalText = payButton.textContent;
+            
+            // 显示加载状态
+            payButton.textContent = '支付中...';
+            payButton.disabled = true;
+            
+            // 模拟支付过程
+            setTimeout(() => {
+                // 这里可以调用实际的支付接口
+                fetch('[[@{/order/pay}]]', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `orderId=${encodeURIComponent(orderId)}`
+                })
+                .then(response => {
+                    // 检查响应是否为JSON
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json();
+                    }
+                    // 如果不是JSON，模拟成功响应
+                    return { success: true };
+                })
+                .then(data => {
+                    if (data.success) {
+                        alert('支付功能正在开发中...');
+                        // 实际开发中应该跳转到支付页面或调用支付API
+                        // window.location.href = `[[@{/payment}]]?orderId=${orderId}`;
+                    } else {
+                        alert('支付失败:' + (data.message || '未知错误'));
+                    }
+                })
+                .catch(error => {
+                    console.error('支付请求失败:', error);
+                    alert('支付功能正在开发中...');
+                })
+                .finally(() => {
+                    // 恢复按钮状态
+                    payButton.textContent = originalText;
+                    payButton.disabled = false;
+                });
+            }, 500);
+        }
+    }
+
+    // 取消订单
+    function cancelOrder(orderId) {
+        if (confirm('确认要取消此订单吗？')) {
+            const cancelButton = event.target;
+            const originalText = cancelButton.textContent;
+            const orderCard = cancelButton.closest('.order-card');
+            
+            // 显示加载状态
+            cancelButton.textContent = '取消中...';
+            cancelButton.disabled = true;
+            
+            fetch('[[@{/order/cancel}]]', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `orderId=${encodeURIComponent(orderId)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 添加取消动画效果
+                    if (orderCard) {
+                        orderCard.style.transition = 'all 0.3s ease';
+                        orderCard.style.opacity = '0.5';
+                        orderCard.style.transform = 'translateX(-10px)';
+                        
+                        setTimeout(() => {
+                            // 更新订单计数
+                            const orderCountElement = document.querySelector('.orders-header .text-muted span');
+                            const currentCount = parseInt(orderCountElement.textContent);
+                            if (currentCount > 0) {
+                                orderCountElement.textContent = currentCount - 1;
+                            }
+                            
+                            // 移除订单卡片
+                            orderCard.remove();
+                            
+                            // 检查是否还有订单
+                            const remainingOrders = document.querySelectorAll('.order-card');
+                            if (remainingOrders.length === 0) {
+                                // 如果没有订单了，显示空订单提示
+                                const emptyOrders = document.querySelector('.empty-orders');
+                                if (emptyOrders) {
+                                    emptyOrders.style.display = 'block';
+                                }
+                            }
+                        }, 300);
+                    }
+                    alert('订单已取消');
+                } else {
+                    alert('取消失败:' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('取消订单失败:', error);
+                alert('网络错误，请稍后重试');
+            })
+            .finally(() => {
+                // 恢复按钮状态
+                cancelButton.textContent = originalText;
+                cancelButton.disabled = false;
+            });
+        }
+    }
+
+    // 页面加载时初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 导航栏链接高亮
+        const navLinks = document.querySelectorAll('.nav-link');
+        const currentPath = window.location.pathname;
+        
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') && currentPath.includes(link.getAttribute('href'))) {
+                link.classList.add('current-page');
+            } else {
+                link.classList.remove('current-page');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

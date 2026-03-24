@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>功能测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .success { color: green; }
+        .error { color: red; }
+        a { color: blue; text-decoration: none; margin: 5px; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>商品类型管理功能测试</h1>
+    
+    <div class="test-section">
+        <h2>1. 登录测试</h2>
+        <a href="/admin/login">前往登录页面</a> (用户名: admin, 密码: 123456)
+    </div>
+    
+    <div class="test-section">
+        <h2>2. 商品类型管理测试</h2>
+        <ul>
+            <li><a href="/admin/type/list">类型列表</a></li>
+            <li><a href="/admin/type/toAdd">添加类型</a></li>
+        </ul>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. 管理首页</h2>
+        <a href="/admin/adminIndex">管理首页</a>
+    </div>
+</body>
+</html>

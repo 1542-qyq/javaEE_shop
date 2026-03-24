@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html  lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>个人中心</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" type="text/css" th:href="@{/css/userIndex.css}"/>
+  <style>
+    :root {
+      --primary-color: #a59aca;
+      --secondary-color: #f8f9fa;
+      --text-color: #333;
+      --border-color: #dee2e6;
+    }
+
+    body {
+      background-color: #f5f7fa;
+      color: var(--text-color);
+    }
+
+    .user-center-container {
+      margin-top: 30px;
+      margin-bottom: 50px;
+    }
+
+    .user-sidebar {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      height: 100%;
+    }
+
+    .user-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-color), #8a7ac2);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: bold;
+      margin: 0 auto 20px;
+      border: 5px solid white;
+      box-shadow: 0 4px 15px rgba(165, 154, 202, 0.3);
+    }
+
+    .user-name {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .user-email {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+
+    .content-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 30px;
+      min-height: 500px;
+    }
+
+    .page-title {
+      color: var(--primary-color);
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .info-item {
+      margin-bottom: 25px;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .info-value {
+      font-size: 16px;
+      color: var(--text-color);
+    }
+
+    .order-card {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    .order-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .order-header {
+      background: #f8f9fa;
+      padding: 15px;
+      border-bottom: 1px solid var(--border-color);
+      border-radius: 8px 8px 0 0;
+    }
+
+    .order-status {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-paid {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .status-shipped {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-completed {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-cancelled {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .order-products {
+      padding: 15px;
+    }
+
+    .product-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #eee;
+    }
+
+    .product-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .product-img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-right: 15px;
+    }
+
+    .product-name {
+      flex: 1;
+      font-weight: bold;
+    }
+
+    .product-price {
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+
+    .order-footer {
+      padding: 15px;
+      background: #f8f9fa;
+      border-top: 1px solid var(--border-color);
+      border-radius: 0 0 8px 8px;
+      text-align: right;
+    }
+
+    .total-price {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .no-data-icon {
+      font-size: 60px;
+      color: #ddd;
+      margin-bottom: 20px;
+    }
+
+    .form-edit-mode {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .btn-custom {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-custom:hover {
+      background-color: #8a7ac2;
+      border-color: #8a7ac2;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(165, 154, 202, 0.3);
+    }
+
+    .security-item {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .user-sidebar {
+        margin-bottom: 20px;
+      }
+
+      .content-card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<nav class="navbar navbar-expand-lg cat-navbar">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/}">电商平台</a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <!-- 用户菜单 -->
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/goods/list}" >
+            商品列表
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" th:href="@{/cart/view}">
+            购物车
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " th:href="@{/order/myOrders}">
+            我的订单</a>
+        </li>
+      </ul>
+
+      <!-- 登录/退出 -->
+      <ul class="navbar-nav ml-3">
+        <li class="nav-item" th:unless="${session.buser != null}">
+          <a class="nav-link" th:href="@{/user/toLogin}">
+            登录
+          </a>
+        </li>
+        <li class="nav-item" th:if="${session.buser != null}">
+          <a class="nav-link" th:href="@{/user/logout}">
+            退出
+          </a>
+        </li>
+        <!-- 后台管理入口 -->
+        <a class="nav-link" th:href="@{/admin/toLogin}">
+          后台管理
+        </a>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container user-center-container">
+  <div class="row">
+    <!-- 侧边栏 -->
+    <div class="col-md-3">
+      <div class="user-sidebar">
+        <div class="user-avatar">
+        <!-- 直接检查字符串是否为空 -->
+        <th:block th:if="${bUser != null}">
+          <div class="user-avatar"
+               th:if="${not #strings.isEmpty(bUser.userName)}"
+               th:text="${#strings.substring(bUser.userName, 0, 1).toUpperCase()}">
+            U
+          </div>
+          <div class="user-avatar"
+               th:unless="${not #strings.isEmpty(bUser.userName)}"
+               th:text="${#strings.substring(bUser.bemail, 0, 1).toUpperCase()}">
+            U
+          </div>
+        </th:block>
+        </div>
+        <div class="user-name" th:text="${session.userName ?: session.buser.bemail}">
+          用户名
+        </div>
+        <div class="user-email" th:text="${session.buser.bemail}">
+          user@example.com
+        </div>
+
+        <ul class="nav-menu">
+          <li class="nav-menu-item">
+            <a href="#profile" class="nav-menu-link active" onclick="showPage('profile')">
+              <div class="nav-menu-icon">
+                <i class="fas fa-user"></i>
+              </div>
+              个人信息
+            </a>
+          </li>
+          <li class="nav-menu-item">
+            <a th:href="@{/order/myOrders}" class="nav-menu-link" >
+              <div class="nav-menu-icon">
+                <i class="fas fa-clipboard-list"></i>
+              </div>
+              我的订单
+            </a>
+          </li>
+          <li class="nav-menu-item">
+            <a href="#security" class="nav-menu-link" onclick="showPage('security')">
+              <div class="nav-menu-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              安全设置
+            </a>
+          </li>
+          <li class="nav-menu-item">
+            <a th:href="@{/}" class="nav-menu-link">
+              <div class="nav-menu-icon">
+                <i class="fas fa-home"></i>
+              </div>
+              返回首页
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="col-md-9">
+      <!-- 个人信息页 -->
+      <div class="content-card" id="profile-page">
+        <h2 class="page-title">
+          <i class="fas fa-user mr-2"></i>个人信息
+        </h2>
+
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+          <span th:text="${successMessage}"></span>
+          <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+          </button>
+        </div>
+
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <span th:text="${errorMessage}"></span>
+          <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+          </button>
+        </div>
+
+        <!-- 查看模式 -->
+        <div id="view-mode">
+          <div class="row">
+            <div class="col-md-6 info-item">
+              <div class="info-label">邮箱地址</div>
+              <div class="info-value" th:text="${bUser.bemail}"></div>
+            </div>
+            <div class="col-md-6 info-item">
+              <div class="info-label">用户名</div>
+              <div class="info-value" th:text="${bUser.userName ?: '未设置'}">
+                未设置
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <button class="btn btn-custom" onclick="toggleEditMode()">
+                <i class="fas fa-edit mr-2"></i>修改信息
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 编辑模式 -->
+        <div id="edit-mode" class="d-none form-edit-mode">
+          <form th:action="@{/user/updateProfile}" method="post" th:object="${bUser}">
+            <div class="form-group">
+              <label for="userName">用户名</label>
+              <input type="text" class="form-control" id="userName"
+                     th:field="*{userName}"
+                     placeholder="请输入用户名">
+              <small class="form-text text-muted">
+                用户名将显示在您的个人资料中
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label>邮箱地址</label>
+              <input type="email" class="form-control"
+                     th:value="${bUser.bemail}"
+                     disabled>
+              <small class="form-text text-muted">
+                邮箱地址不能修改
+              </small>
+            </div>
+
+            <div class="action-buttons">
+              <button type="button" class="btn btn-secondary" onclick="toggleEditMode()">
+                取消
+              </button>
+              <button type="submit" class="btn btn-custom">
+                <i class="fas fa-save mr-2"></i>保存修改
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- 我的订单页 -->
+      <div class="content-card d-none" id="orders-page">
+        <h2 class="page-title">
+          <i class="fas fa-clipboard-list mr-2"></i>我的订单
+        </h2>
+
+      </div>
+
+      <!-- 安全设置页 -->
+      <div class="content-card d-none" id="security-page">
+        <h2 class="page-title">
+          <i class="fas fa-shield-alt mr-2"></i>安全设置
+        </h2>
+
+        <!-- 修改密码 -->
+        <div class="security-item">
+          <h5 class="font-weight-bold mb-3">
+            <i class="fas fa-key mr-2"></i>修改密码
+          </h5>
+          <form id="change-password-form" th:action="@{/user/updatePassword}" method="post">
+            <input type="hidden" name="id" th:value="${bUser.id}">
+
+            <div class="form-group">
+              <label for="currentPassword">当前密码</label>
+              <input type="password" class="form-control" id="currentPassword"
+                     name="currentPassword" required>
+            </div>
+
+            <div class="form-group">
+              <label for="newPassword">新密码</label>
+              <input type="password" class="form-control" id="newPassword"
+                     name="newPassword" required minlength="6">
+              <small class="form-text text-muted">
+                密码长度不能少于6位
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">确认新密码</label>
+              <input type="password" class="form-control" id="confirmPassword"
+                     name="confirmPassword" required>
+            </div>
+
+            <div class="action-buttons">
+              <button type="submit" class="btn btn-custom">
+                <i class="fas fa-save mr-2"></i>修改密码
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 页脚 -->
+<footer class="bg-dark text-white py-4 mt-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <h5>电商平台</h5>
+        <p class="text-light">为您提供优质的商品和服务</p>
+      </div>
+      <div class="col-md-6 text-right">
+        <p>© 2025 电商平台. -23覃海霞-01邱彦琦-.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+<script>
+  // 页面切换功能
+  function showPage(pageId) {
+    // 隐藏所有页面
+    document.getElementById('profile-page').classList.add('d-none');
+    document.getElementById('orders-page').classList.add('d-none');
+    document.getElementById('security-page').classList.add('d-none');
+
+    // 显示目标页面
+    document.getElementById(pageId + '-page').classList.remove('d-none');
+
+    // 更新导航菜单激活状态
+    document.querySelectorAll('.nav-menu-link').forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + pageId) {
+        link.classList.add('active');
+      }
+    });
+
+    // 如果是订单页，自动加载订单数据
+    if (pageId === 'orders') {
+      loadOrderData();
+    }
+  }
+
+  // 编辑模式切换
+  function toggleEditMode() {
+    const viewMode = document.getElementById('view-mode');
+    const editMode = document.getElementById('edit-mode');
+
+    if (viewMode.classList.contains('d-none')) {
+      viewMode.classList.remove('d-none');
+      editMode.classList.add('d-none');
+    } else {
+      viewMode.classList.add('d-none');
+      editMode.classList.remove('d-none');
+    }
+  }
+
+  // 订单筛选功能
+  function filterOrders(status) {
+    // 更新筛选按钮状态
+    document.querySelectorAll('.btn-group .btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    // 这里实际应该向后端请求对应状态的订单数据
+    // 目前是前端筛选，实际项目中建议在后端处理
+    const allOrders = document.querySelectorAll('.order-card');
+    allOrders.forEach(order => {
+      const orderStatus = order.querySelector('.order-status').textContent;
+      if (status === 'all' || orderStatus === status) {
+        order.style.display = 'block';
+      } else {
+        order.style.display = 'none';
+      }
+    });
+
+    // 检查是否有显示的订单
+    const visibleOrders = Array.from(allOrders).filter(order => order.style.display !== 'none');
+    if (visibleOrders.length === 0) {
+      // 显示无订单提示
+      document.getElementById('no-orders').classList.remove('d-none');
+    } else {
+      document.getElementById('no-orders').classList.add('d-none');
+    }
+  }
+
+  // 取消订单功能
+  function cancelOrder(orderId) {
+    if (confirm('确定要取消这个订单吗？')) {
+      // 使用AJAX调用取消订单接口
+      fetch('/order/cancel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `orderId=${orderId}`
+      })
+              .then(response => response.text())
+              .then(data => {
+                const parts = data.split(':');
+                if (parts[0] === 'success') {
+                  alert('订单取消成功');
+                  // 刷新订单列表
+                  location.reload();
+                } else {
+                  alert('取消失败: ' + parts[1]);
+                }
+              })
+              .catch(error => {
+                alert('网络错误，请稍后重试');
+              });
+    }
+  }
+
+  // 修改密码表单验证
+  document.getElementById('change-password-form')?.addEventListener('submit', function(e) {
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    // 验证输入
+    if (newPassword.length < 6) {
+      alert('新密码长度不能少于6位');
+      e.preventDefault();
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert('两次输入的新密码不一致');
+      e.preventDefault();
+      return;
+    }
+  });
+
+  // 加载订单数据（如果需要的话）
+  function loadOrderData() {
+    // 这里可以添加AJAX请求来动态加载订单数据
+    // 目前数据已经在页面加载时通过Thymeleaf渲染
+    console.log('加载订单数据...');
+  }
+
+  // 页面加载时默认显示个人信息页
+  document.addEventListener('DOMContentLoaded', function() {
+    showPage('profile');
+  });
+</script>
+</body>
+</html>

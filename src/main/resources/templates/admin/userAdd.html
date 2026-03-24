@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加用户 - 后台管理系统</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f7ff;
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* 主容器 */
+        .main-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(165, 154, 202, 0.15);
+            border: 2px solid #e6d9ff;
+            position: relative;
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .main-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #a59aca, #d4c5ff, #a59aca);
+        }
+
+        /* 标题区域 */
+        .header-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f0ebff;
+        }
+
+        .header-section h1 {
+            color: #a59aca;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .header-section p {
+            color: #8a7bb0;
+            font-size: 0.95rem;
+        }
+
+        /* 表单容器 */
+        .form-container {
+            margin-top: 1rem;
+        }
+
+        /* 表单行 */
+        .form-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.8rem;
+            gap: 1.5rem;
+        }
+
+        /* 标签样式 */
+        .form-label {
+            width: 120px;
+            padding-top: 0.5rem;
+            color: #5a5560;
+            font-weight: bold;
+            font-size: 1rem;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* 输入区域 */
+        .form-input {
+            flex: 1;
+        }
+
+        /* 输入框通用样式 */
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e6d9ff;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #fcfaff;
+            color: #5a5560;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #a59aca;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(165, 154, 202, 0.2);
+        }
+
+        /* 密码输入框 */
+        input[type="password"].form-control {
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        /* 按钮容器 */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #f0ebff;
+        }
+
+        /* 按钮通用样式 */
+        .btn {
+            padding: 0.9rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            border: none;
+        }
+
+        .submit-btn {
+            background-color: #a59aca;
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background-color: #8a7bb0;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.3);
+        }
+
+        .back-btn {
+            background-color: #e6d9ff;
+            color: #5a5560;
+            border: 2px solid #d4c5ff;
+        }
+
+        .back-btn:hover {
+            background-color: #d4c5ff;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(165, 154, 202, 0.2);
+        }
+
+
+
+        .home-btn {
+            padding: 0.8rem 1.5rem;
+            background-color: #f0ebff;
+            color: #8a7bb0;
+            border: 2px solid #e6d9ff;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 120px;
+        }
+
+        .home-btn:hover {
+            background-color: #e6d9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(165, 154, 202, 0.2);
+        }
+
+        .home-btn::before {
+            font-size: 1rem;
+        }
+
+
+
+        .decor-dot:nth-child(1) {
+            top: 10%;
+            left: 5%;
+        }
+
+        .decor-dot:nth-child(2) {
+            top: 15%;
+            right: 5%;
+        }
+
+        .decor-dot:nth-child(3) {
+            bottom: 15%;
+            left: 7%;
+        }
+
+        .decor-dot:nth-child(4) {
+            bottom: 10%;
+            right: 7%;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 2rem 1.5rem;
+                margin-top: 1rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .form-label {
+                width: 100%;
+                text-align: left;
+                padding-top: 0;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .footer-buttons {
+                position: static;
+                text-align: center;
+                margin-top: 2rem;
+                padding-top: 1.5rem;
+                border-top: 2px solid #f0ebff;
+            }
+
+            .home-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px 10px;
+            }
+
+            .main-container {
+                padding: 1.5rem 1.2rem;
+            }
+
+            .header-section h1 {
+                font-size: 1.6rem;
+            }
+        }
+
+
+
+    </style>
+</head>
+<body>
+
+
+<div class="main-container">
+    <div class="header-section">
+        <h1>添加用户</h1>
+        <p>添加新的系统用户</p>
+    </div>
+
+    <form class="form-container" th:action="@{/admin/user/add}" method="post" th:object="${user}">
+        <div class="form-row">
+            <label class="form-label">用户名:</label>
+            <div class="form-input">
+                <input type="text" class="form-control" th:field="*{userName}" placeholder="请输入用户名" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label class="form-label">密码:</label>
+            <div class="form-input">
+                <input type="password" class="form-control" th:field="*{bpwd}" placeholder="请输入密码" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label class="form-label">邮箱:</label>
+            <div class="form-input">
+                <input type="text" class="form-control" th:field="*{bemail}" placeholder="请输入邮箱地址" required>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn submit-btn">添加用户</button>
+            <a th:href="@{/admin/user/list}" class="btn back-btn">返回列表</a>
+        </div>
+    </form>
+
+
+</div>
+</body>
+</html>

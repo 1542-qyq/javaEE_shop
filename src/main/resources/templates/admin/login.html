@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>后台管理系统 - 登录</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            background-color: #f9f7ff;
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* 登录卡片 */
+        .login-card {
+            background-color: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 15px 35px rgba(165, 154, 202, 0.2);
+            border: 2px solid #e6d9ff;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #a59aca, #d4c5ff, #a59aca);
+        }
+
+        /* 标题 */
+        .login-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-title .cat-icon {
+            font-size: 3.5rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .login-title h1 {
+            color: #a59aca;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-title p {
+            color: #8a7bb0;
+            font-size: 0.9rem;
+        }
+
+        /* 表单样式 */
+        .login-form div {
+            margin-bottom: 1.5rem;
+        }
+
+        .login-form label {
+            display: block;
+            color: #5a5560;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .login-form input[type="text"],
+        .login-form input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e6d9ff;
+            border-radius: 10px;
+            font-size: 1rem;
+            background-color: #fcfaff;
+            color: #5a5560;
+        }
+
+        .login-form input[type="text"]:focus,
+        .login-form input[type="password"]:focus {
+            outline: none;
+            border-color: #a59aca;
+            box-shadow: 0 0 0 3px rgba(165, 154, 202, 0.2);
+        }
+
+        /* 提交按钮 */
+        .login-form input[type="submit"] {
+            width: 100%;
+            padding: 0.9rem;
+            background-color: #a59aca;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .login-form input[type="submit"]:hover {
+            background-color: #8a7bb0;
+        }
+
+        /* 错误提示 */
+        .error-message {
+            color: #ff6b8b;
+            background-color: #fff0f3;
+            border: 1px solid #ffd6e0;
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* 页脚 */
+        .login-footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #b8a9d9;
+            font-size: 0.8rem;
+        }
+
+        /* 小猫爪子装饰 */
+        .cat-paw {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0.2;
+        }
+
+        .cat-paw:nth-child(1) {
+            top: 15%;
+            left: 10%;
+        }
+
+        .cat-paw:nth-child(2) {
+            top: 20%;
+            right: 8%;
+        }
+
+        .cat-paw:nth-child(3) {
+            bottom: 20%;
+            left: 12%;
+        }
+
+        .cat-paw:nth-child(4) {
+            bottom: 15%;
+            right: 10%;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .login-title .cat-icon {
+                font-size: 3rem;
+            }
+
+            .login-title h1 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-card">
+    <div class="login-title">
+        <h1>后台管理系统</h1>
+        <p>管理员登录</p>
+    </div>
+
+    <!-- 错误提示 -->
+    <div th:if="${param.error}" class="error-message">
+        用户名或密码错误
+    </div>
+
+    <form class="login-form" th:action="@{/admin/login}" method="post">
+        <div>
+            <label for="aname">用户名</label>
+            <input type="text"
+                   id="aname"
+                   name="aname"
+                   placeholder="请输入用户名"
+                   required
+                   autofocus>
+        </div>
+
+        <div>
+            <label for="apwd">密码</label>
+            <input type="password"
+                   id="apwd"
+                   name="apwd"
+                   placeholder="请输入密码"
+                   required>
+        </div>
+
+        <div>
+            <input type="submit" value="登录系统"/>
+        </div>
+    </form>
+
+    <div class="login-footer">
+        <p>© 后台管理系统 | 01-邱彦琦 23-覃海霞</p>
+    </div>
+</div>
+</body>
+</html>

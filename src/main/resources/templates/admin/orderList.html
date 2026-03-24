@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>订单列表 - 后台管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f7ff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(165, 154, 202, 0.15);
+            border: 2px solid #e6d9ff;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0ebff;
+        }
+
+        .header h1 {
+            color: #a59aca;
+            font-size: 1.8rem;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 0.7rem 1rem;
+            border: 2px solid #e6d9ff;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            min-width: 200px;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .primary-btn {
+            background-color: #a59aca;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background-color: #8a7bb0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #f0ebff;
+        }
+
+        th {
+            background-color: #f9f7ff;
+            color: #5a5560;
+            font-weight: bold;
+        }
+
+        td {
+            color: #5a5560;
+        }
+
+        .status-shipped {
+            color: #ffa502;
+            font-weight: bold;
+            background-color: rgba(255, 165, 2, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .status-completed {
+            color: #3742fa;
+            font-weight: bold;
+            background-color: rgba(55, 66, 250, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .status-canceled {
+            color: #70a1ff;
+            font-weight: bold;
+            background-color: rgba(112, 161, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        tr:hover {
+            background-color: #fcfaff;
+        }
+
+        .status-paid {
+            color: #2ed573;
+            font-weight: bold;
+            background-color: rgba(46, 213, 115, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .status-unpaid {
+            color: #ff4757;
+            font-weight: bold;
+            background-color: rgba(255, 71, 87, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            text-decoration: none;
+        }
+
+        .edit-btn {
+            background-color: #e6d9ff;
+            color: #5a5560;
+            border: 1px solid #d4c5ff;
+        }
+
+        .delete-btn {
+            background-color: #ffebe9;
+            color: #ff4757;
+            border: 1px solid #ffd8d6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #8a7bb0;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .success-message {
+            background-color: rgba(46, 213, 115, 0.1);
+            color: #2ed573;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .error-message {
+            background-color: rgba(255, 71, 87, 0.1);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+        .home-btn {
+            padding: 0.8rem 1.5rem;
+            background-color: #f0ebff;
+            color: #8a7bb0;
+            border: 2px solid #e6d9ff;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 120px;
+        }
+
+        .home-btn:hover {
+            background-color: #e6d9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(165, 154, 202, 0.2);
+        }
+
+        .home-btn::before {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>订单管理</h1>
+        <div style="display: flex; gap: 1rem;">
+            <a th:href="@{/admin/order/toAdd}" class="btn primary-btn">+ 添加订单</a>
+            <a th:href="@{/admin}" class="btn" style="background-color: #f0ebff; color: #8a7bb0;">返回首页</a>
+        </div>
+    </div>
+
+    <!-- 消息提示 -->
+    <div th:if="${success}" class="message success-message" th:text="${success}"></div>
+    <div th:if="${error}" class="message error-message" th:text="${error}"></div>
+
+    <!-- 搜索表单 -->
+    <form class="search-form" th:action="@{/admin/order/list}" method="get">
+        <input type="number" name="busertable_id" class="search-input"
+               th:value="${busertable_id}" placeholder="输入用户ID搜索订单">
+        <button type="submit" class="btn primary-btn">搜索</button>
+        <a th:href="@{/admin/order/list}" class="btn" style="background-color: #f0ebff; color: #5a5560;">重置</a>
+    </form>
+
+    <!-- 订单表格 -->
+    <div class="table-container">
+        <div th:if="${orderList != null and !orderList.isEmpty()}">
+            <table>
+                <thead>
+                <tr>
+                    <th>订单ID</th>
+                    <th>用户ID</th>
+                    <th>订单日期</th>
+                    <th>总金额</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orderList}">
+                    <td th:text="${order.id}"></td>
+                    <td th:text="${order.busertableId}"></td>
+                    <td th:text="${order.orderDate != null} ? ${#dates.format(order.orderDate, 'yyyy-MM-dd')} : 'N/A'"></td>
+                    <td th:text="${order.amount != null} ? '¥' + ${#numbers.formatDecimal(order.amount, 1, 2)} : '¥0.00'"></td>
+                    <td>
+                        <span th:if="${order.status == '已付款'}" class="status-paid">已付款</span>
+                        <span th:if="${order.status == '待付款'}" class="status-unpaid">未付款</span>
+                        <span th:if="${order.status == '已发货'}" class="status-shipped">已发货</span>
+                        <span th:if="${order.status == '已完成'}" class="status-completed">已完成</span>
+                        <span th:if="${order.status == '已取消'}" class="status-canceled">已取消</span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a th:href="@{/admin/order/toEdit(id=${order.id})}" class="action-btn edit-btn">编辑</a>
+                            <a th:href="@{/admin/order/delete(id=${order.id})}"
+                               class="action-btn delete-btn"
+                               onclick="return confirm('确定要删除这个订单吗？')">删除</a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 空状态 -->
+        <div th:if="${orderList == null or orderList.isEmpty()}" class="empty-state">
+            <div>📋</div>
+            <h3>暂无订单数据</h3>
+            <p th:if="${busertable_id != null}">未找到用户ID为 <span th:text="${busertable_id}"></span> 的订单</p>
+            <p th:unless="${busertable_id != null}">还没有任何订单记录，点击上方按钮添加第一个订单</p>
+        </div>
+    </div>
+</div>
+
+<!-- 调试信息 -->
+<script>
+    console.log('订单列表页面加载完成');
+</script>
+</body>
+</html>

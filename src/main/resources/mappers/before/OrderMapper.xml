@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ch.ch9.repository.before.OrderRepository">
+
+    <!-- 订单结果映射 -->
+    <resultMap id="orderResultMap" type="com.ch.ch9.entity.Order">
+        <id property="id" column="id"/>
+        <result property="busertableId" column="busertable_id"/>
+        <result property="amount" column="amount"/>
+        <result property="orderDate" column="order_date"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <!-- 订单+用户信息结果映射 -->
+    <resultMap id="orderWithUserResultMap" type="com.ch.ch9.entity.Order">
+        <id property="id" column="id"/>
+        <result property="busertableId" column="busertable_id"/>
+        <result property="amount" column="amount"/>
+        <result property="orderDate" column="order_date"/>
+        <result property="status" column="status"/>
+        <!-- 关联用户信息 -->
+        <result property="userName" column="userName"/>
+        <result property="userEmail" column="bemail"/>
+    </resultMap>
+
+    <!-- 创建订单 -->
+    <insert id="createOrder" parameterType="com.ch.ch9.entity.Order" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO orderbasetable (busertable_id, amount, order_date, status)
+        VALUES (#{busertableId}, #{amount}, #{orderDate}, #{status})
+    </insert>
+
+    <!-- 根据ID查询订单 -->
+    <select id="findById" parameterType="Integer" resultMap="orderResultMap">
+        SELECT *
+        FROM orderbasetable
+        WHERE id = #{id}
+    </select>
+
+    <!-- 根据用户ID查询订单列表 -->
+    <select id="findByUserId" parameterType="Integer" resultMap="orderWithUserResultMap">
+        SELECT o.*, b.userName, b.bemail
+        FROM orderbasetable o
+                 LEFT JOIN busertable b ON o.busertable_id = b.id
+        WHERE o.busertable_id = #{userId}
+        ORDER BY o.order_date DESC
+    </select>
+
+    <!-- 更新订单状态 -->
+    <update id="updateOrderStatus">
+        UPDATE orderbasetable
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 查询用户最近的订单 -->
+    <select id="findRecentOrdersByUserId" resultMap="orderWithUserResultMap">
+        SELECT o.*, b.userName, b.bemail
+        FROM orderbasetable o
+        LEFT JOIN busertable b ON o.busertable_id = b.id
+        WHERE o.busertable_id = #{userId}
+        ORDER BY o.order_date DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+</mapper>

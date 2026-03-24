@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ch.ch9.mapper.admin.UserMapper">
+
+    <!-- 查询所有用户 -->
+    <select id="findAllUsers" resultType="com.ch.ch9.entity.BUser">
+        SELECT id, userName, bpwd, bemail
+        FROM busertable
+        ORDER BY id ASC
+    </select>
+
+    <!-- 根据用户名模糊查询 -->
+    <select id="findByuserName" resultType="com.ch.ch9.entity.BUser">
+        SELECT id, userName, bpwd, bemail
+        FROM busertable
+        WHERE userName LIKE CONCAT('%', #{userName}, '%')
+        ORDER BY id ASC
+    </select>
+
+    <!-- 重置自增ID（MySQL语法） -->
+    <update id="resetAutoIncrement">
+        ALTER TABLE busertable AUTO_INCREMENT = 1
+    </update>
+
+</mapper>

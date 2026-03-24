@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ch.ch9.mapper.admin.OrderMapper">
+
+    <!-- 定义resultMap解决字段映射问题 -->
+    <resultMap id="orderResultMap" type="com.ch.ch9.entity.Order">
+        <id property="id" column="id"/>
+        <result property="busertableId" column="busertable_id"/>
+        <result property="orderDate" column="order_date"/>
+        <result property="amount" column="amount"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <select id="findByBusertableId" parameterType="Integer" resultMap="orderResultMap">
+        select * from orderbasetable where busertable_id = #{busertableId} order by order_date desc
+    </select>
+
+    <update id="resetAutoIncrement">
+        ALTER TABLE orderbasetable AUTO_INCREMENT = 1
+    </update>
+
+</mapper>
